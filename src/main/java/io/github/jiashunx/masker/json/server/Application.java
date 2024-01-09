@@ -1,5 +1,6 @@
 package io.github.jiashunx.masker.json.server;
 
+import io.github.jiashunx.masker.json.server.service.ArgumentService;
 import io.github.jiashunx.masker.rest.framework.MRestServer;
 import io.github.jiashunx.masker.rest.framework.filter.MRestFilter;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -10,7 +11,8 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 public class Application {
 
     public static void main(String[] args) {
-        new MRestServer(18080, "json-server")
+        ArgumentService argumentService = new ArgumentService(args);
+        new MRestServer(argumentService.getListenPort(), "json-server")
                 .bossThreadNum(1)
                 .workerThreadNum(2)
                 .context()
