@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<table-metadata id="json-server">
+    <!-- 数据定义SQL -->
+    <ddl>
+        <table name="tb_server">
+            <column name="server_id" type="varchar(32)" primary="true" />
+            <column name="server_name" type="nvarchar(256)" not-null="true" />
+            <column name="server_port" type="int" not-null="true" />
+            <column name="server_context" type="varchar(128)" not-null="true" />
+            <column name="create_time" type="timestamp" not-null="true" />
+            <column name="last_modify_time" type="timestamp" not-null="true" />
+        </table>
+        <index name="tb_server_unique" table="tb_server" unique="true">
+            <column name="server_port" />
+        </index>
+        <table name="tb_rest">
+            <column name="rest_id" type="varchar(32)" primary="true" />
+            <column name="rest_name" type="nvarchar(256)" not-null="true" />
+            <column name="server_id" type="varchar(32)" not-null="true" />
+            <column name="rest_url" type="nvarchar(512)" not-null="true" />
+            <column name="rest_body" type="clob" not-null="true" />
+            <column name="create_time" type="timestamp" not-null="true" />
+            <column name="last_modify_time" type="timestamp" not-null="true" />
+        </table>
+        <index name="tb_rest_unique" table="tb_rest" unique="true">
+            <column name="server_id" />
+            <column name="rest_url" />
+        </index>
+    </ddl>
+</table-metadata>
