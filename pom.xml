@@ -4,9 +4,8 @@
   <artifactId>masker-json-server</artifactId>
   <name>masker-json-server</name>
   <packaging>jar</packaging>
-  <version>${revision}</version>
+  <version>x.y.z-SNAPSHOT</version>
   <properties>
-    <revision>x.y.z-SNAPSHOT</revision>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <jdk.compiler.version>11</jdk.compiler.version>
@@ -63,7 +62,7 @@
       <dependency>
         <groupId>io.github.jiashunx</groupId>
         <artifactId>sdk-sqlite3-all</artifactId>
-        <version>1.0.0.RELEASE</version>
+        <version>1.1.0.RELEASE</version>
       </dependency>
       <dependency>
         <groupId>commons-cli</groupId>
