@@ -12,6 +12,7 @@
         </table>
         <index name="tb_server_unique" table="tb_server" unique="true">
             <column name="server_port" />
+            <column name="server_context"/>
         </index>
         <table name="tb_rest">
             <column name="rest_id" type="varchar(32)" primary="true" />
