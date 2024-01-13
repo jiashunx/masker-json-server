@@ -89,7 +89,7 @@ public class ServerContext {
     }
 
     public RestResult queryAll() {
-        return RestResult.ok(tbServerService.selectFields(Collections.singletonList("server_id, server_name"), sql -> { sql.append(" order by server_name asc "); }, statement -> {}));
+        return RestResult.ok(tbServerService.selectFields(Collections.singletonList("server_id, server_name, server_port, server_context"), sql -> { sql.append(" order by server_name asc "); }, statement -> {}));
     }
 
     public TbServerService getTbServerService() {

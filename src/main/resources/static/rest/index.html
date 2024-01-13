@@ -17,9 +17,6 @@
     <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" lay-event="delete">
         <i class="layui-icon layui-icon-delete"></i>
     </button>
-    <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" lay-event="detail">
-        <i class="layui-icon layui-icon-log"></i>
-    </button>
 </script>
 
 <script type="application/javascript" src="/dist/plugins/layui@2.9.1/layui.js"></script>
@@ -61,7 +58,7 @@
                     if (data['serverContext'] === '/') {
                         data['serverContext'] = '';
                     }
-                    data['httpUrl'] = window.location.protocol + window.location.hostname + data['serverContext'] + data['restUrl'];
+                    data['httpUrl'] = window.location.protocol + window.location.hostname + ':' + data['serverPort'] + data['serverContext'] + data['restUrl'];
                 }
                 return arr;
             },
@@ -80,11 +77,11 @@
             pagebar: '#table-rests-pagebar',
             cols: [[
                 {field:'restId', title: 'Rest接口ID', width: 300, align: 'center'},
-                {field:'restName', title: 'Rest接口名称', Width: 200},
-                {field:'httpUrl', title: 'Rest接口URL', minWidth: 200, align: 'center'},
+                {field:'restName', title: 'Rest接口名称', minWidth: 200, align: 'center'},
+                {field:'httpUrl', title: 'Rest接口URL', minWidth: 300, align: 'center'},
                 {field:'createTime', title: '创建时间', width: 166, align: 'center'},
                 {field:'lastModifyTime', title: '最后更新时间', width: 166, align: 'center'},
-                {width:260, title: '操作', toolbar: '#table-rests-action', align: 'center'}
+                {width:160, title: '操作', toolbar: '#table-rests-action', align: 'center'}
             ]],
         });
         table.on('tool(table-rests)', function (obj) {
@@ -128,21 +125,6 @@
                                 layer.alert(`删除Rest接口【${restName}】失败：code=${data.code}，message=${data.message}`);
                             },
                         });
-                    });
-                    break;
-                case 'detail':
-                    // 组合页面使用父页面layer|独立页面使用当前页面layer
-                    layer.open({
-                        type: 2,
-                        area:['50%','50%'],
-                        title: 'Rest接口详情',
-                        content: '/rest/detail.html',
-                        success: function (layero, index, that) {
-                            // 获取子页面iframe的window对象
-                            var iframeWin = $('div.layui-layer-content > iframe', layero)[0].contentWindow;
-                            // 调用子页面iframe初始化方法（传入当前页面window对象）
-                            iframeWin.init(index, window, obj.data);
-                        },
                     });
                     break;
             }
