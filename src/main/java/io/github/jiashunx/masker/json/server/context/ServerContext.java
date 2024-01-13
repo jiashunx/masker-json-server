@@ -81,7 +81,7 @@ public class ServerContext {
     public RestResult queryList(PageQueryVo pageQueryVo) {
         int total = tbServerService.getJdbcTemplate().queryForInt("select count(1) from tb_server");
         return RestResult.ok(new PageQueryOutVo<>().setTotal(total).setRecords(tbServerService.selectWithPage(pageQueryVo.getPageIndex(), pageQueryVo.getPageSize(), sql -> {
-            sql.append(" order by last_modify_time asc ");
+            sql.append(" order by last_modify_time desc ");
         }, statement -> {})));
     }
 
