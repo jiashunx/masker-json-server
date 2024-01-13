@@ -16,7 +16,6 @@ import io.github.jiashunx.masker.rest.framework.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -26,16 +25,12 @@ public class Servlet extends AbstractRestServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(Servlet.class);
 
-    private final TbServerService tbServerService;
-    private final TbRestService tbRestService;
     private final ServerContext serverContext;
     private final RestContext restContext;
 
     public Servlet(TbServerService tbServerService, TbRestService tbRestService) {
-        this.tbServerService = Objects.requireNonNull(tbServerService);
-        this.tbRestService = Objects.requireNonNull(tbRestService);
-        this.serverContext = new ServerContext(this.tbServerService, this.tbRestService);
-        this.restContext = new RestContext(this.tbServerService, this.tbRestService);
+        this.serverContext = new ServerContext(tbServerService);
+        this.restContext = new RestContext(tbRestService);
     }
 
     private volatile boolean initialized = false;
@@ -77,9 +72,9 @@ public class Servlet extends AbstractRestServlet {
         response.write(execute(() -> serverContext.queryList(request.parseBodyToObj(PageQueryVo.class))));
     }
 
-    @PostMapping(url = "/server/queryOne")
-    public void queryServer(MRestRequest request, MRestResponse response) {
-        response.write(execute(() -> serverContext.queryOne(request.parseBodyToObj(TbServer.class))));
+    @PostMapping(url = "/server/queryAll")
+    public void queryServersAll(MRestRequest request, MRestResponse response) {
+        response.write(execute(serverContext::queryAll));
     }
 
     @PostMapping(url = "/rest/create")
@@ -100,11 +95,6 @@ public class Servlet extends AbstractRestServlet {
     @PostMapping(url = "/rest/queryList")
     public void queryRests(MRestRequest request, MRestResponse response) {
         response.write(execute(() -> restContext.queryList(request.parseBodyToObj(PageQueryVo.class))));
-    }
-
-    @PostMapping(url = "/rest/queryOne")
-    public void queryRest(MRestRequest request, MRestResponse response) {
-        response.write(execute(() -> restContext.queryOne(request.parseBodyToObj(TbRest.class))));
     }
 
 }
