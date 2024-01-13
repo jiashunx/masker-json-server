@@ -29,7 +29,7 @@ public class Application {
         // 创建Server实例
         MRestServer restServer = new MRestServer(argumentService.getListenPort(), "json-server");
         // 创建路由处理Servlet
-        Servlet servlet = new Servlet(tbServerService, tbRestService);
+        Servlet servlet = new Servlet(argumentService, tbServerService, tbRestService);
         // 启动web服务
         restServer.bossThreadNum(1)
                 .workerThreadNum(2)

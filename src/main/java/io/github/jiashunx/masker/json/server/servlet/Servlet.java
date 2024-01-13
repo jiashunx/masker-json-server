@@ -7,6 +7,7 @@ import io.github.jiashunx.masker.json.server.model.RestResult;
 import io.github.jiashunx.masker.json.server.model.TbRest;
 import io.github.jiashunx.masker.json.server.model.TbServer;
 import io.github.jiashunx.masker.json.server.model.invo.PageQueryVo;
+import io.github.jiashunx.masker.json.server.service.ArgumentService;
 import io.github.jiashunx.masker.json.server.service.TbRestService;
 import io.github.jiashunx.masker.json.server.service.TbServerService;
 import io.github.jiashunx.masker.rest.framework.MRestRequest;
@@ -30,8 +31,8 @@ public class Servlet extends AbstractRestServlet {
     private final RestContext restContext;
     private final ServerEngine serverEngine;
 
-    public Servlet(TbServerService tbServerService, TbRestService tbRestService) {
-        this.serverContext = new ServerContext(tbServerService);
+    public Servlet(ArgumentService argumentService, TbServerService tbServerService, TbRestService tbRestService) {
+        this.serverContext = new ServerContext(argumentService, tbServerService);
         this.restContext = new RestContext(tbRestService);
         this.serverEngine = new ServerEngine(this.serverContext, this.restContext);
         this.serverContext.setServerEngine(this.serverEngine);

@@ -5,6 +5,7 @@ import io.github.jiashunx.masker.json.server.model.RestResult;
 import io.github.jiashunx.masker.json.server.model.TbServer;
 import io.github.jiashunx.masker.json.server.model.invo.PageQueryVo;
 import io.github.jiashunx.masker.json.server.model.outvo.PageQueryOutVo;
+import io.github.jiashunx.masker.json.server.service.ArgumentService;
 import io.github.jiashunx.masker.json.server.service.TbServerService;
 import io.github.jiashunx.masker.json.server.type.ServerStatus;
 import io.github.jiashunx.masker.rest.framework.util.MRestUtils;
@@ -19,19 +20,24 @@ import java.util.Objects;
  */
 public class ServerContext {
 
+    private final ArgumentService argumentService;
     private final TbServerService tbServerService;
     private ServerEngine serverEngine;
 
-    public ServerContext(TbServerService tbServerService) {
+    public ServerContext(ArgumentService argumentService, TbServerService tbServerService) {
+        this.argumentService = Objects.requireNonNull(argumentService);
         this.tbServerService = Objects.requireNonNull(tbServerService);
     }
 
     public RestResult create(TbServer serverObj) {
+        if (serverObj.getServerPort() == argumentService.getListenPort()) {
+            return RestResult.failWithMessage(String.format("端口[%d]与当前服务端口冲突，请修改后提交", serverObj.getServerPort()));
+        }
         TbServer samePortEntity = tbServerService.getJdbcTemplate().queryForObj("select * from tb_server where server_port=?", statement -> {
             statement.setInt(1, serverObj.getServerPort());
         }, TbServer.class);
         if (samePortEntity != null) {
-            return RestResult.failWithMessage(String.format("端口[%d]冲突，请修改后提交", serverObj.getServerPort()));
+            return RestResult.failWithMessage(String.format("端口[%d]与其他Server实例端口冲突，请修改后提交", serverObj.getServerPort()));
         }
         serverObj.setServerId(StringUtils.randomUUID());
         serverObj.setServerContext(MRestUtils.formatContextPath(serverObj.getServerContext()));
@@ -46,6 +52,9 @@ public class ServerContext {
     }
 
     public RestResult update(TbServer serverObj) {
+        if (serverObj.getServerPort() == argumentService.getListenPort()) {
+            return RestResult.failWithMessage(String.format("端口[%d]与当前服务端口冲突，请修改后提交", serverObj.getServerPort()));
+        }
         TbServer entity = tbServerService.findWithNoCache(serverObj.getServerId());
         if (entity == null) {
             return RestResult.failWithMessage(String.format("根据Server实例ID[%s]找不到对应记录", serverObj.getServerId()));
@@ -61,7 +70,7 @@ public class ServerContext {
                 statement.setInt(1, serverObj.getServerPort());
             }, TbServer.class);
             if (samePortEntity != null) {
-                return RestResult.failWithMessage(String.format("端口[%d]冲突，请修改后提交", serverObj.getServerPort()));
+                return RestResult.failWithMessage(String.format("端口[%d]与其他Server实例端口冲突，请修改后提交", serverObj.getServerPort()));
             }
         }
         tbServerService.updateWithNoCache(serverObj);
