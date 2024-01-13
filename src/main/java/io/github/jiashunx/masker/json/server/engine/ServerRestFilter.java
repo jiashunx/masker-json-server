@@ -47,7 +47,7 @@ public class ServerRestFilter implements MRestFilter {
                 }
             }
             if (StringUtils.isEmpty(content)) {
-                content = MRestSerializer.objectToJson(RestResult.failWithMessage(String.format("未配置当前请求URL[%s]的JSON响应报文，请配置后重试！", requestUrl)), true);
+                content = MRestSerializer.objectToJson(RestResult.failWithMessage(String.format("当前Server处理Context[%s]未配置请求URL[%s]的JSON响应报文，请配置后重试！", request.getContextPath(), requestUrl)), true);
             }
         } catch (Throwable throwable) {
             logger.error("URL[{}]匹配处理异常", requestUrl, throwable);
