@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>新增Server</title>
+    <link type="text/css" rel="stylesheet" href="/dist/plugins/layui@2.9.1/css/layui.css">
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="layui-form-item">
+        <label class="layui-form-label">Server名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="serverName" lay-verify="required" placeholder="请输入Server名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">Server端口</label>
+        <div class="layui-input-block">
+            <input type="number" name="serverPort" lay-verify="required" placeholder="请输入Server端口" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">Context-Path</label>
+        <div class="layui-input-block">
+            <input type="text" name="serverContext" lay-verify="required" placeholder="请输入Context-Path" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="submit" class="layui-btn" lay-submit lay-filter="serverAction">提交</button>
+        </div>
+    </div>
+</form>
+
+<script type="application/javascript" src="/dist/plugins/layui@2.9.1/layui.js"></script>
+<script type="application/javascript" src="/dist/plugins/axios@0.27.2/axios.min.js"></script>
+<script type="application/javascript" src="/dist/js/rest.js"></script>
+<script>
+    var iframeIndex = null;     // 组合页面当前iframe索引
+    var iframeParent = null;    // 组合页面当前iframe父窗口window对象
+    var iframeData = null;      // 组合页面传入数据
+    // 组合页面使用父页面layui|独立页面使用当前页面layui
+    var rest = new MRest(parent.layui || layui);
+    layui.use(function(){
+        var form = layui.form;
+        var layer = layui.layer;
+        var $ = layui.$;
+
+        // 提交事件
+        form.on('submit(serverAction)', function (data) {
+            // 若无法获取父页面layui对象则使用当前页面layui对象，以实现iframe在父页面中弹窗
+            var layer = (parent.layui || layui).layer;
+            var field = data.field;
+            var serverName = field.serverName;
+            var serverPort = field.serverPort;
+            var serverContext = field.serverContext;
+            // 组合页面修改
+            if (iframeIndex != null) {
+                rest.axiosRequest({
+                    method: 'post',
+                    url: '/server/update',
+                    data: {
+                        serverId: iframeData.serverId,
+                        serverName: serverName,
+                        serverPort: serverPort,
+                        serverContext: serverContext,
+                    },
+                    succFunc: function (data, resp) {
+                        layer.alert(`修改Server【${serverName}】成功`, {}, function (index) {
+                            layer.close(index);
+                            // 关闭iframe弹窗
+                            close();
+                            // 父页面重新加载（按照当前设计，parent获取的是顶层window对象，不一定是实际parent对象）
+                            iframeParent.reload();
+                        });
+                    },
+                    failFunc: function (data, resp) {
+                        layer.alert(`修改Server【${serverName}】失败：code=${data.code}，message=${data.message}`);
+                    },
+                });
+                return false; // 阻止form跳转
+            }
+            // 新增
+            rest.axiosRequest({
+                method: 'post',
+                url: '/server/create',
+                data: {
+                    serverName: serverName,
+                    serverPort: serverPort,
+                    serverContext: serverContext,
+                },
+                succFunc: function (data, resp) {
+                    layer.alert(`新增Server【${serverName}】成功`, {}, function (index) {
+                        layer.close(index);
+                        $('input[name="serverName"]').val('');
+                        $('input[name="serverPort"]').val('');
+                        $('input[name="serverContext"]').val('');
+                    });
+                },
+                failFunc: function (data, resp) {
+                    layer.alert(`新增Server【${serverName}】失败：code=${data.code}，message=${data.message}`);
+                },
+            });
+            return false; // 阻止form跳转
+        });
+
+    });
+
+    /**
+     * iframe页面数据初始化
+     * @param index iframe窗口index
+     * @param parent 父iframe窗口window对象
+     * @param data 传递的页面数据
+     */
+    function init(index, parent, data) {
+        iframeIndex = index;
+        iframeParent = parent;
+        iframeData = data;
+        layui.$('input[name=serverName]').val(data.serverName);
+        layui.$('input[name=serverPort]').val(data.serverPort);
+        layui.$('input[name=serverContext]').val(data.serverContext);
+    }
+
+    /**
+     * iframe页面关闭方法
+     */
+    function close() {
+        if (iframeIndex >= 0) {
+            // 若无法获取父页面layui对象则使用当前页面layui对象，以实现iframe在父页面中弹窗
+            var layer = (parent.layui || layui).layer;
+            layer.close(iframeIndex);
+        }
+    }
+
+</script>
+
+</body>
+</html>

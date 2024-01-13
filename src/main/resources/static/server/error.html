@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>错误日志</title>
+    <link type="text/css" rel="stylesheet" href="/dist/plugins/layui@2.9.1/css/layui.css">
+</head>
+<body>
+<div id="error-content" style="margin: 10px 10px 10px 10px;"></div>
+
+<script type="application/javascript" src="/dist/plugins/layui@2.9.1/layui.js"></script>
+<script type="application/javascript" src="/dist/plugins/axios@0.27.2/axios.min.js"></script>
+<script type="application/javascript" src="/dist/js/rest.js"></script>
+<script>
+    var iframeIndex = null;     // 组合页面当前iframe索引
+    var iframeParent = null;    // 组合页面当前iframe父窗口window对象
+    var iframeData = null;      // 组合页面传入数据
+    // 组合页面使用父页面layui|独立页面使用当前页面layui
+    var rest = new MRest(parent.layui || layui);
+    layui.use(function(){
+        var form = layui.form;
+        var layer = layui.layer;
+        var $ = layui.$;
+
+    });
+
+    /**
+     * iframe页面数据初始化
+     * @param index iframe窗口index
+     * @param parent 父iframe窗口window对象
+     * @param data 传递的页面数据
+     */
+    function init(index, parent, data) {
+        iframeIndex = index;
+        iframeParent = parent;
+        iframeData = data;
+        layui.$('#error-content').html(data);
+    }
+
+</script>
+
+</body>
+</html>
