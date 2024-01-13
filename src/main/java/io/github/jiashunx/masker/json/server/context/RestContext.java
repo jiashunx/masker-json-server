@@ -6,6 +6,7 @@ import io.github.jiashunx.masker.json.server.model.TbRest;
 import io.github.jiashunx.masker.json.server.model.invo.PageQueryVo;
 import io.github.jiashunx.masker.json.server.model.outvo.PageQueryOutVo;
 import io.github.jiashunx.masker.json.server.service.TbRestService;
+import io.github.jiashunx.masker.rest.framework.util.MRestUtils;
 import io.github.jiashunx.masker.rest.framework.util.StringUtils;
 
 import java.util.Date;
@@ -31,7 +32,7 @@ public class RestContext {
             return RestResult.failWithMessage(String.format("Server[%s]URL[%s]冲突，请修改后提交", restObj.getServerId(), restObj.getRestUrl()));
         }
         restObj.setServerId(StringUtils.randomUUID());
-        restObj.setRestUrl(restObj.getRestUrl().trim());
+        restObj.setRestUrl(MRestUtils.formatPath(restObj.getRestUrl()));
         try {
             new ObjectMapper().readTree(restObj.getRestBody());
         } catch (Throwable throwable) {
@@ -47,7 +48,7 @@ public class RestContext {
         if (entity == null) {
             return RestResult.failWithMessage(String.format("根据Rest接口实例ID[%s]找不到对应记录", restObj.getRestId()));
         }
-        restObj.setRestUrl(restObj.getRestUrl());
+        restObj.setRestUrl(MRestUtils.formatPath(restObj.getRestUrl()));
         try {
             new ObjectMapper().readTree(restObj.getRestBody());
         } catch (Throwable throwable) {
@@ -79,10 +80,15 @@ public class RestContext {
     }
 
     public RestResult queryList(PageQueryVo pageQueryVo) {
-        int total = tbRestService.getJdbcTemplate().queryForInt("select count(1) from tb_server");
-        return RestResult.ok(new PageQueryOutVo<>().setTotal(total).setRecords(tbRestService.selectWithPage(pageQueryVo.getPageIndex(), pageQueryVo.getPageSize(), sql -> {
-            sql.append(" order by last_modify_time desc ");
-        }, statement -> {})));
+        int total = tbRestService.getJdbcTemplate().queryForInt("select count(1) from tb_rest");
+        return RestResult.ok(new PageQueryOutVo<>().setTotal(total).setRecords(tbRestService.getJdbcTemplate().queryForList(
+               "select a.rest_id,a.rest_name,a.server_id,a.rest_url,a.rest_body,a.create_time,a.last_modify_time,b.server_port,b.server_context " +
+                    "from tb_rest a " +
+                    "left join tb_server b on a.server_id = b.server_id " +
+                    "order by a.last_modify_time desc " +
+                    "limit " + (pageQueryVo.getPageIndex() - 1) * pageQueryVo.getPageSize() + ", " + pageQueryVo.getPageSize()
+                , statement -> {}
+                , TbRest.class)));
     }
 
     public TbRestService getTbRestService() {

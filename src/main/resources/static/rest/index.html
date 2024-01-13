@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>查询Rest接口</title>
+    <link type="text/css" rel="stylesheet" href="/dist/plugins/layui@2.9.1/css/layui.css">
+</head>
+<body>
+
+<table class="layui-table" id="table-rests" lay-even style="margin: 0px"></table>
+<div id="table-rests-pagebar"></div>
+<script type="text/html" id="table-rests-action">
+    <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" lay-event="update">
+        <i class="layui-icon layui-icon-edit"></i>
+    </button>
+    <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" lay-event="delete">
+        <i class="layui-icon layui-icon-delete"></i>
+    </button>
+    <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" lay-event="detail">
+        <i class="layui-icon layui-icon-log"></i>
+    </button>
+</script>
+
+<script type="application/javascript" src="/dist/plugins/layui@2.9.1/layui.js"></script>
+<script type="application/javascript" src="/dist/plugins/axios@0.27.2/axios.min.js"></script>
+<script type="application/javascript" src="/dist/js/rest.js"></script>
+<script>
+    // 组合页面使用父页面layui|独立页面使用当前页面layui
+    var rest = new MRest(parent.layui || layui);
+    layui.use(['table', 'util', 'layer'], function () {
+        var $ = layui.$;
+        var table = layui.table;
+        var util = layui.util;
+        var layer = layui.layer;
+
+        // 表格渲染处理
+        table.render({
+            elem: '#table-rests',
+            async: true,
+            url:'/rest/queryList',
+            method: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            header: {}, // 请求头
+            where: {},  // 请求的其他参数
+            request: {
+                pageName: 'pageIndex',  // 页码的参数名称，默认page
+                limitName: 'pageSize',  // 每页数据量的参数名称，默认limit
+            },
+            // 数据转换（res 即为原始返回的数据）
+            parseData: function (res) {
+                var arr = {
+                    "code": res.code,
+                    "msg": res.message,
+                    "count": (res.data || {}).total || 0,
+                    "data": (res.data || {}).records || [],
+                };
+                for (var i = 0; i < arr.data.length; i++) {
+                    var data = arr.data[i];
+                    if (data['serverContext'] === '/') {
+                        data['serverContext'] = '';
+                    }
+                    data['httpUrl'] = window.location.protocol + window.location.hostname + data['serverContext'] + data['restUrl'];
+                }
+                return arr;
+            },
+            // 数据接口请求完成后执行，无论成功还是失败均会触发
+            complete: function (xhr, ts) {
+                $('th').css({'text-align': 'center'});
+            },
+            limit: 10,
+            limits: [10, 20, 50],
+            page: {
+                layout: ['count', 'prev', 'page', 'next', 'limit', 'skip'],
+                groups: 1,      // 只显示1个连续页码
+                first: false,   // 不显示首页
+                last: false,    // 不显示尾页
+            },
+            pagebar: '#table-rests-pagebar',
+            cols: [[
+                {field:'restId', title: 'Rest接口ID', width: 300, align: 'center'},
+                {field:'restName', title: 'Rest接口名称', Width: 200},
+                {field:'httpUrl', title: 'Rest接口URL', minWidth: 200, align: 'center'},
+                {field:'createTime', title: '创建时间', width: 166, align: 'center'},
+                {field:'lastModifyTime', title: '最后更新时间', width: 166, align: 'center'},
+                {width:260, title: '操作', toolbar: '#table-rests-action', align: 'center'}
+            ]],
+        });
+        table.on('tool(table-rests)', function (obj) {
+            // 若无法获取父页面layui对象则使用当前页面layui对象，以实现iframe在父页面中弹窗
+            var layer = (parent.layui || layui).layer;
+            var event = obj.event;
+            switch (event) {
+                case 'update':
+                    // 组合页面使用父页面layer|独立页面使用当前页面layer
+                    layer.open({
+                        type: 2,
+                        area:['50%','50%'],
+                        title: '修改Rest接口',
+                        content: '/rest/create.html',
+                        success: function (layero, index, that) {
+                            // 获取子页面iframe的window对象
+                            var iframeWin = $('div.layui-layer-content > iframe', layero)[0].contentWindow;
+                            // 调用子页面iframe初始化方法（传入当前页面window对象）
+                            iframeWin.init(index, window, obj.data);
+                        },
+                    });
+                    break;
+                case 'delete':
+                    var restId = obj.data.restId;
+                    var restName = obj.data.restName;
+                    layer.confirm(`确定删除Rest接口【${restName}】？`, {}, function (index) {
+                        layer.close(index);
+                        rest.axiosRequest({
+                            method: 'post',
+                            url: '/rest/delete',
+                            data: {
+                                restId: restId,
+                            },
+                            succFunc: function (data, resp) {
+                                layer.alert(`删除Rest接口【${restName}】成功`, {}, function (index) {
+                                    layer.close(index);
+                                    reload();
+                                });
+                            },
+                            failFunc: function (data, resp) {
+                                layer.alert(`删除Rest接口【${restName}】失败：code=${data.code}，message=${data.message}`);
+                            },
+                        });
+                    });
+                    break;
+                case 'detail':
+                    // 组合页面使用父页面layer|独立页面使用当前页面layer
+                    layer.open({
+                        type: 2,
+                        area:['50%','50%'],
+                        title: 'Rest接口详情',
+                        content: '/rest/detail.html',
+                        success: function (layero, index, that) {
+                            // 获取子页面iframe的window对象
+                            var iframeWin = $('div.layui-layer-content > iframe', layero)[0].contentWindow;
+                            // 调用子页面iframe初始化方法（传入当前页面window对象）
+                            iframeWin.init(index, window, obj.data);
+                        },
+                    });
+                    break;
+            }
+        });
+    });
+
+    /**
+     * 页面reload处理
+     */
+    function reload () {
+        layui.table.reload('table-rests', {
+            where: {},
+            page: {curr: 1},
+        });
+    }
+
+</script>
+
+</body>
+</html>

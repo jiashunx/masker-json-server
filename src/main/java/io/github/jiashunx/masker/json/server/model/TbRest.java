@@ -58,6 +58,18 @@ public class TbRest {
     @SQLite3Column(columnName = "last_modify_time")
     private Date lastModifyTime;
 
+    /**
+     * 查询输出使用: Server服务端口
+     */
+    @SQLite3Column(columnName = "server_port")
+    private int serverPort;
+
+    /**
+     * 查询输出使用: Server的context-path, 默认: "/"
+     */
+    @SQLite3Column(columnName = "server_context")
+    private String serverContext;
+
     public String getRestId() {
         return restId;
     }
@@ -112,5 +124,21 @@ public class TbRest {
 
     public void setLastModifyTime(Date lastModifyTime) {
         this.lastModifyTime = lastModifyTime;
+    }
+
+    public int getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
+    }
+
+    public String getServerContext() {
+        return serverContext;
+    }
+
+    public void setServerContext(String serverContext) {
+        this.serverContext = serverContext;
     }
 }
