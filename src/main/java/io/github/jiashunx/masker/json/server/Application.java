@@ -1,5 +1,7 @@
 package io.github.jiashunx.masker.json.server;
 
+import io.github.jiashunx.masker.json.server.service.TbRestService;
+import io.github.jiashunx.masker.json.server.service.TbServerService;
 import io.github.jiashunx.masker.json.server.servlet.Servlet;
 import io.github.jiashunx.masker.json.server.service.ArgumentService;
 import io.github.jiashunx.masker.rest.framework.MRestServer;
@@ -21,13 +23,20 @@ public class Application {
         SQLPackage sqlPackage = SQLite3SQLHelper.loadSQLPackageFromClasspath("ddl-sqlite3.xml");
         // 初始化SQLite3数据库表结构
         jdbcTemplate.initSQLPackage(sqlPackage);
+        // 初始化服务实例
+        TbServerService tbServerService = new TbServerService(jdbcTemplate);
+        TbRestService tbRestService = new TbRestService(jdbcTemplate);
+        // 创建Server实例
+        MRestServer restServer = new MRestServer(argumentService.getListenPort(), "json-server");
+        // 创建路由处理Servlet
+        Servlet servlet = new Servlet(tbServerService, tbRestService);
         // 启动web服务
-        new MRestServer(argumentService.getListenPort(), "json-server")
-                .bossThreadNum(1)
+        restServer.bossThreadNum(1)
                 .workerThreadNum(2)
+                .callbackAfterStartup(servlet::initServlet)
                 .context()
                 .addDefaultClasspathResource()
-                .servlet(new Servlet(jdbcTemplate).initServlet())
+                .servlet(servlet)
                 .getRestServer()
                 .start();
     }
