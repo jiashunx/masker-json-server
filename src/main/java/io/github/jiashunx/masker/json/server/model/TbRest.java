@@ -13,26 +13,47 @@ import java.util.Date;
 @SQLite3Table(tableName = "tb_rest")
 public class TbRest {
 
+    /**
+     * Rest接口实例ID
+     */
     @SQLite3Id
     @SQLite3Column(columnName = "rest_id")
     private String restId;
 
+    /**
+     * Rest接口名称
+     */
     @SQLite3Column(columnName = "rest_name")
     private String restName;
 
+    /**
+     * Server实例ID
+     */
     @SQLite3Column(columnName = "server_id")
     private int serverId;
 
+    /**
+     * Rest接口URL
+     */
     @SQLite3Column(columnName = "rest_url")
     private String restUrl;
 
+    /**
+     * Rest接口响应JSON
+     */
     @SQLite3Column(columnName = "rest_body")
     private String restBody;
 
+    /**
+     * 创建时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @SQLite3Column(columnName = "create_time")
     private Date createTime;
 
+    /**
+     * 最后更新时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @SQLite3Column(columnName = "last_modify_time")
     private Date lastModifyTime;

@@ -13,23 +13,53 @@ import java.util.Date;
 @SQLite3Table(tableName = "tb_server")
 public class TbServer {
 
+    /**
+     * Server实例ID
+     */
     @SQLite3Id
     @SQLite3Column(columnName = "server_id")
     private String serverId;
 
+    /**
+     * Server名称
+     */
     @SQLite3Column(columnName = "server_name")
     private String serverName;
 
+    /**
+     * Server服务端口
+     */
     @SQLite3Column(columnName = "server_port")
     private int serverPort;
 
+    /**
+     * Server的context-path, 默认: "/"
+     */
     @SQLite3Column(columnName = "server_context")
     private String serverContext;
 
+    /**
+     * Server当前状态: 0-未启动, 1-启动失败, 2-启动成功
+     */
+    @SQLite3Column(columnName = "server_status")
+    private String serverStatus;
+
+    /**
+     * Server启动错误日志
+     */
+    @SQLite3Column(columnName = "startup_err_log")
+    private String startupErrLog;
+
+    /**
+     * 创建时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @SQLite3Column(columnName = "create_time")
     private Date createTime;
 
+    /**
+     * 最后更新时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @SQLite3Column(columnName = "last_modify_time")
     private Date lastModifyTime;
@@ -64,6 +94,22 @@ public class TbServer {
 
     public void setServerContext(String serverContext) {
         this.serverContext = serverContext;
+    }
+
+    public String getServerStatus() {
+        return serverStatus;
+    }
+
+    public void setServerStatus(String serverStatus) {
+        this.serverStatus = serverStatus;
+    }
+
+    public String getStartupErrLog() {
+        return startupErrLog;
+    }
+
+    public void setStartupErrLog(String startupErrLog) {
+        this.startupErrLog = startupErrLog;
     }
 
     public Date getCreateTime() {
