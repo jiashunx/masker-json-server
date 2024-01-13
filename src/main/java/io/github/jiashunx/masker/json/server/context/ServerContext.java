@@ -1,9 +1,11 @@
 package io.github.jiashunx.masker.json.server.context;
 
+import io.github.jiashunx.masker.json.server.engine.ServerEngine;
 import io.github.jiashunx.masker.json.server.model.RestResult;
 import io.github.jiashunx.masker.json.server.model.TbServer;
 import io.github.jiashunx.masker.json.server.model.invo.PageQueryVo;
 import io.github.jiashunx.masker.json.server.service.TbServerService;
+import io.github.jiashunx.masker.json.server.type.ServerStatus;
 import io.github.jiashunx.masker.rest.framework.util.StringUtils;
 
 import java.util.Collections;
@@ -16,6 +18,7 @@ import java.util.Objects;
 public class ServerContext {
 
     private final TbServerService tbServerService;
+    private ServerEngine serverEngine;
 
     public ServerContext(TbServerService tbServerService) {
         this.tbServerService = Objects.requireNonNull(tbServerService);
@@ -29,10 +32,12 @@ public class ServerContext {
             return RestResult.failWithMessage(String.format("端口[%d]冲突，请修改后提交", serverObj.getServerPort()));
         }
         serverObj.setServerId(StringUtils.randomUUID());
+        serverObj.setServerStatus(ServerStatus.NOT_START.getCode());
         serverObj.setCreateTime(new Date());
         serverObj.setLastModifyTime(serverObj.getCreateTime());
         tbServerService.insertWithNoCache(serverObj);
         // 启动Server
+        serverEngine.startServer(serverObj.getServerId());
         return RestResult.ok();
     }
 
@@ -54,6 +59,7 @@ public class ServerContext {
         }
         tbServerService.updateWithNoCache(serverObj);
         // 重启Server
+        serverEngine.restartServer(serverObj.getServerId());
         return RestResult.ok();
     }
 
@@ -64,6 +70,7 @@ public class ServerContext {
         }
         tbServerService.deleteById(serverObj.getServerId());
         // 停止Server
+        serverEngine.stopServer(serverObj.getServerId());
         return RestResult.ok();
     }
 
@@ -79,5 +86,13 @@ public class ServerContext {
 
     public TbServerService getTbServerService() {
         return tbServerService;
+    }
+
+    public ServerEngine getServerEngine() {
+        return serverEngine;
+    }
+
+    public void setServerEngine(ServerEngine serverEngine) {
+        this.serverEngine = serverEngine;
     }
 }

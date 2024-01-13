@@ -2,6 +2,7 @@ package io.github.jiashunx.masker.json.server.servlet;
 
 import io.github.jiashunx.masker.json.server.context.RestContext;
 import io.github.jiashunx.masker.json.server.context.ServerContext;
+import io.github.jiashunx.masker.json.server.engine.ServerEngine;
 import io.github.jiashunx.masker.json.server.model.RestResult;
 import io.github.jiashunx.masker.json.server.model.TbRest;
 import io.github.jiashunx.masker.json.server.model.TbServer;
@@ -27,18 +28,20 @@ public class Servlet extends AbstractRestServlet {
 
     private final ServerContext serverContext;
     private final RestContext restContext;
+    private final ServerEngine serverEngine;
 
     public Servlet(TbServerService tbServerService, TbRestService tbRestService) {
         this.serverContext = new ServerContext(tbServerService);
         this.restContext = new RestContext(tbRestService);
+        this.serverEngine = new ServerEngine(this.serverContext, this.restContext);
+        this.serverContext.setServerEngine(this.serverEngine);
     }
 
     private volatile boolean initialized = false;
 
     public synchronized void initServlet() {
         if (!initialized) {
-            // TODO 启动所有server+rest
-            logger.info("启动server实例完成");
+            serverEngine.startServers();
             initialized = true;
         }
     }
