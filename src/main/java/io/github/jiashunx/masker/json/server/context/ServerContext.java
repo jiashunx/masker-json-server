@@ -7,6 +7,7 @@ import io.github.jiashunx.masker.json.server.model.invo.PageQueryVo;
 import io.github.jiashunx.masker.json.server.model.outvo.PageQueryOutVo;
 import io.github.jiashunx.masker.json.server.service.TbServerService;
 import io.github.jiashunx.masker.json.server.type.ServerStatus;
+import io.github.jiashunx.masker.rest.framework.util.MRestUtils;
 import io.github.jiashunx.masker.rest.framework.util.StringUtils;
 
 import java.util.Collections;
@@ -33,6 +34,7 @@ public class ServerContext {
             return RestResult.failWithMessage(String.format("端口[%d]冲突，请修改后提交", serverObj.getServerPort()));
         }
         serverObj.setServerId(StringUtils.randomUUID());
+        serverObj.setServerContext(MRestUtils.formatContextPath(serverObj.getServerContext()));
         serverObj.setServerStatus(ServerStatus.NOT_START.getCode());
         serverObj.setStartupErrLog("");
         serverObj.setCreateTime(new Date());
@@ -48,6 +50,7 @@ public class ServerContext {
         if (entity == null) {
             return RestResult.failWithMessage(String.format("根据Server实例ID[%s]找不到对应记录", serverObj.getServerId()));
         }
+        serverObj.setServerContext(MRestUtils.formatContextPath(serverObj.getServerContext()));
         serverObj.setServerStatus(entity.getServerStatus());
         serverObj.setStartupErrLog(entity.getStartupErrLog());
         serverObj.setCreateTime(entity.getCreateTime());
