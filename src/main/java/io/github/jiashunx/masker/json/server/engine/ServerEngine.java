@@ -73,7 +73,7 @@ public class ServerEngine {
                         .bossThreadNum(1)
                         .workerThreadNum(2)
                         .context(server.getServerContext())
-                        .filter("/*", new ServerFilter(serverContext, restContext))
+                        .filter("/*", new ServerRestFilter(serverId, restContext))
                         .getRestServer()
                         .start();
                 serverMap.put(serverId, restServer);

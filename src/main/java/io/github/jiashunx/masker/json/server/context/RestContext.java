@@ -1,5 +1,6 @@
 package io.github.jiashunx.masker.json.server.context;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.jiashunx.masker.json.server.model.RestResult;
 import io.github.jiashunx.masker.json.server.model.TbRest;
 import io.github.jiashunx.masker.json.server.model.invo.PageQueryVo;
@@ -7,7 +8,6 @@ import io.github.jiashunx.masker.json.server.service.TbRestService;
 import io.github.jiashunx.masker.rest.framework.util.StringUtils;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -30,6 +30,12 @@ public class RestContext {
             return RestResult.failWithMessage(String.format("Server[%s]URL[%s]冲突，请修改后提交", restObj.getServerId(), restObj.getRestUrl()));
         }
         restObj.setServerId(StringUtils.randomUUID());
+        restObj.setRestUrl(restObj.getRestUrl().trim());
+        try {
+            new ObjectMapper().readTree(restObj.getRestBody());
+        } catch (Throwable throwable) {
+            return RestResult.failWithMessage(String.format("Server[%s]URL[%s]响应报文不是JSON格式，请修改后提交", restObj.getServerId(), restObj.getRestUrl()));
+        }
         restObj.setCreateTime(new Date());
         restObj.setLastModifyTime(restObj.getCreateTime());
         return RestResult.ok(tbRestService.insertWithNoCache(restObj));
@@ -39,6 +45,12 @@ public class RestContext {
         TbRest entity = tbRestService.findWithNoCache(restObj.getRestId());
         if (entity == null) {
             return RestResult.failWithMessage(String.format("根据Rest接口实例ID[%s]找不到对应记录", restObj.getRestId()));
+        }
+        restObj.setRestUrl(restObj.getRestUrl());
+        try {
+            new ObjectMapper().readTree(restObj.getRestBody());
+        } catch (Throwable throwable) {
+            return RestResult.failWithMessage(String.format("Server[%s]URL[%s]响应报文不是JSON格式，请修改后提交", restObj.getServerId(), restObj.getRestUrl()));
         }
         restObj.setCreateTime(entity.getCreateTime());
         restObj.setLastModifyTime(new Date());
@@ -69,14 +81,6 @@ public class RestContext {
         return RestResult.ok(tbRestService.selectWithPage(pageQueryVo.getPageIndex(), pageQueryVo.getPageSize(), sql -> {
             sql.append(" order by last_modify_time asc ");
         }, statement -> {}));
-    }
-
-    public List<TbRest> queryByServerId(String serverId) {
-        return tbRestService.select(sql -> {
-            sql.append(" where server_id=? ");
-        }, statement -> {
-            statement.setString(1, serverId);
-        });
     }
 
     public TbRestService getTbRestService() {
