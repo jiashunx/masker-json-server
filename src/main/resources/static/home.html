@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>json server</title>
+    <link type="text/css" rel="stylesheet" href="/dist/plugins/layui@2.9.1/css/layui.css">
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-body">
+        <div>欢迎使用json server！</div>
+    </div>
+</div>
+
+<script type="application/javascript" src="/dist/plugins/layui@2.9.1/layui.js"></script>
+<script type="application/javascript" src="/dist/plugins/axios@0.27.2/axios.min.js"></script>
+<script type="application/javascript" src="/dist/js/rest.js"></script>
+<script>
+    var rest = new MRest(layui);
+    layui.use(['element', 'layer', 'util'], function () {
+        var element = layui.element;
+        var layer = layui.layer;
+        var util = layui.util;
+        var $ = layui.$;
+    });
+
+</script>
+
+</body>
+</html>

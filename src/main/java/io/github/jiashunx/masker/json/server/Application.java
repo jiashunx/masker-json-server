@@ -26,6 +26,7 @@ public class Application {
                 .bossThreadNum(1)
                 .workerThreadNum(2)
                 .context()
+                .addDefaultClasspathResource()
                 .servlet(new Servlet(jdbcTemplate).initServlet())
                 .getRestServer()
                 .start();

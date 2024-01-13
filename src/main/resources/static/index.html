@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>json server</title>
+    <link type="text/css" rel="stylesheet" href="/dist/plugins/layui@2.9.1/css/layui.css">
+    <style>
+        .layui-tab-title .layui-this {
+            color: #ffffff;
+            font-weight: bolder;
+            background-color: #009688;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo layui-hide-xs layui-bg-black">json server</div>
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left">
+        </ul>
+        <ul class="layui-nav layui-layout-center">
+            <li class="layui-show-xs-inline-block">
+            </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
+                <a>
+                    <img src="/dist/img/icon-user.png" class="layui-nav-img">
+                    <label id="index-username"></label>
+                </a>
+                <dl class="layui-nav-child">
+                    <dd>
+                        <a href="#" onclick="logout()">
+                            <span style="font-size: 15px;margin-right: 10px">注销</span>
+                            <i class="layui-icon layui-icon-logout" style="font-size: 15px; color: red;"></i>
+                        </a>
+                    </dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-shrink="all" lay-filter="menu">
+                <li class="layui-nav-item layui-this">
+                    <dd><a data-url="/home.html" data-ref="home" data-opened="1">主页</a></dd>
+                </li>
+                <li class="layui-nav-item">
+                    <a >Server管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a data-url="/server/index.html" data-ref="serverIndex">查询Server</a></dd>
+                        <dd><a data-url="/server/create.html" data-ref="serverIndex">新增Server</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a >接口管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a data-url="/rest/index.html" data-ref="restIndex">查询接口</a></dd>
+                        <dd><a data-url="/rest/create.html" data-ref="restIndex">新增接口</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div style="padding: 0 15px 15px 15px;width: 97%;height: 95%">
+            <div class="layui-tab" lay-filter="lay-content" lay-allowclose="true">
+                <ul class="layui-tab-title">
+                    <li class="layui-this" lay-id="home">主页</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show">
+                        <div class="layui-row">
+                            <iframe class="mjsiframe" scrolling="auto" style="border: 0;height: 666px;width: 100%;" src="/home.html" id="home"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-footer" style="padding-left: 15px">
+        <!-- 底部固定区域 -->
+        欢迎使用json server！
+    </div>
+</div>
+
+<script type="application/javascript" src="/dist/plugins/layui@2.9.1/layui.js"></script>
+<script type="application/javascript" src="/dist/plugins/axios@0.27.2/axios.min.js"></script>
+<script type="application/javascript" src="/dist/js/rest.js"></script>
+<script>
+    var rest = new MRest(layui);
+    layui.use(['element', 'layer', 'util'], function () {
+        var element = layui.element;
+        var layer = layui.layer;
+        var util = layui.util;
+        var $ = layui.$;
+
+        // 菜单栏（默认添加主页）
+        var tabs = ['home'];
+
+        // 导航菜单处理
+        element.on('nav(menu)', function (elem) {
+            var $this = $(this);
+            var label = elem.text();
+            var url = $this.attr('data-url');
+            var ref = $this.attr('data-ref');
+            var opened = $this.attr('data-opened');
+            if (url && ref) {
+                // 若菜单已打开，切换标签
+                if (opened) {
+                    element.tabChange('lay-content', ref);
+                    return;
+                }
+                element.tabAdd('lay-content', {
+                    title: label,
+                    content: `<iframe class='mjsiframe' scrolling='auto' style='border: 0;height: 666px;width: 100%;' src='${url}' id='${ref}'></iframe>`,
+                    id: ref,
+                    change: true, // 添加完毕后即自动切换
+                });
+                $this.attr('data-opened', '1');
+                tabs.push(ref);
+            }
+        });
+
+        // 导航菜单删除处理
+        element.on('tabDelete(lay-content)', function (data) {
+            var ref = tabs[data.index];
+            $(`a[data-ref='${ref}']`).attr('data-opened', '');
+            tabs.splice(data.index, 1);
+        });
+
+        // 隐藏导航主页菜单删除按钮
+        $('.layui-tab-title').find('.layui-tab-close').first().hide();
+
+    });
+
+    // 指定父页面layui对象
+    window.layui = layui;
+
+    // 回显用户名
+    layui.$(`#index-username`).html('默认用户');
+
+    function logout () {
+        window.location.href = '/index.html';
+        return false;
+    }
+
+</script>
+
+</body>
+</html>
