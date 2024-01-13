@@ -5,6 +5,7 @@ import io.github.jiashunx.masker.json.server.model.RestResult;
 import io.github.jiashunx.masker.json.server.model.TbRest;
 import io.github.jiashunx.masker.json.server.model.invo.PageQueryVo;
 import io.github.jiashunx.masker.json.server.model.outvo.PageQueryOutVo;
+import io.github.jiashunx.masker.json.server.model.outvo.TbRestOutVo;
 import io.github.jiashunx.masker.json.server.service.TbRestService;
 import io.github.jiashunx.masker.rest.framework.util.MRestUtils;
 import io.github.jiashunx.masker.rest.framework.util.StringUtils;
@@ -31,7 +32,7 @@ public class RestContext {
         if (sameRest != null) {
             return RestResult.failWithMessage(String.format("Server[%s]URL[%s]冲突，请修改后提交", restObj.getServerId(), restObj.getRestUrl()));
         }
-        restObj.setServerId(StringUtils.randomUUID());
+        restObj.setRestId(StringUtils.randomUUID());
         restObj.setRestUrl(MRestUtils.formatPath(restObj.getRestUrl()));
         try {
             new ObjectMapper().readTree(restObj.getRestBody());
@@ -88,7 +89,7 @@ public class RestContext {
                     "order by a.last_modify_time desc " +
                     "limit " + (pageQueryVo.getPageIndex() - 1) * pageQueryVo.getPageSize() + ", " + pageQueryVo.getPageSize()
                 , statement -> {}
-                , TbRest.class)));
+                , TbRestOutVo.class)));
     }
 
     public TbRestService getTbRestService() {

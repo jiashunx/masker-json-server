@@ -1,17 +1,16 @@
-package io.github.jiashunx.masker.json.server.model;
+package io.github.jiashunx.masker.json.server.model.outvo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.github.jiashunx.masker.json.server.model.TbRest;
 import io.github.jiashunx.sdk.sqlite3.metadata.annotation.SQLite3Column;
 import io.github.jiashunx.sdk.sqlite3.metadata.annotation.SQLite3Id;
-import io.github.jiashunx.sdk.sqlite3.metadata.annotation.SQLite3Table;
 
 import java.util.Date;
 
 /**
  * @author jiashunx
  */
-@SQLite3Table(tableName = "tb_rest")
-public class TbRest {
+public class TbRestOutVo extends TbRest {
 
     /**
      * Rest接口实例ID
@@ -57,6 +56,18 @@ public class TbRest {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @SQLite3Column(columnName = "last_modify_time")
     private Date lastModifyTime;
+
+    /**
+     * 查询输出使用: Server服务端口
+     */
+    @SQLite3Column(columnName = "server_port")
+    private int serverPort;
+
+    /**
+     * 查询输出使用: Server的context-path, 默认: "/"
+     */
+    @SQLite3Column(columnName = "server_context")
+    private String serverContext;
 
     public String getRestId() {
         return restId;
@@ -112,6 +123,22 @@ public class TbRest {
 
     public void setLastModifyTime(Date lastModifyTime) {
         this.lastModifyTime = lastModifyTime;
+    }
+
+    public int getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
+    }
+
+    public String getServerContext() {
+        return serverContext;
+    }
+
+    public void setServerContext(String serverContext) {
+        this.serverContext = serverContext;
     }
 
 }
