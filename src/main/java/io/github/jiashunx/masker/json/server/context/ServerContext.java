@@ -33,6 +33,7 @@ public class ServerContext {
         }
         serverObj.setServerId(StringUtils.randomUUID());
         serverObj.setServerStatus(ServerStatus.NOT_START.getCode());
+        serverObj.setStartupErrLog("");
         serverObj.setCreateTime(new Date());
         serverObj.setLastModifyTime(serverObj.getCreateTime());
         tbServerService.insertWithNoCache(serverObj);
@@ -46,6 +47,8 @@ public class ServerContext {
         if (entity == null) {
             return RestResult.failWithMessage(String.format("根据Server实例ID[%s]找不到对应记录", serverObj.getServerId()));
         }
+        serverObj.setServerStatus(entity.getServerStatus());
+        serverObj.setStartupErrLog(entity.getStartupErrLog());
         serverObj.setCreateTime(entity.getCreateTime());
         serverObj.setLastModifyTime(new Date());
         // 若端口有更新，则查找新端口是否存在
