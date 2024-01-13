@@ -30,7 +30,7 @@ public class TbRest {
      * Server实例ID
      */
     @SQLite3Column(columnName = "server_id")
-    private int serverId;
+    private String serverId;
 
     /**
      * Rest接口URL
@@ -74,11 +74,11 @@ public class TbRest {
         this.restName = restName;
     }
 
-    public int getServerId() {
+    public String getServerId() {
         return serverId;
     }
 
-    public void setServerId(int serverId) {
+    public void setServerId(String serverId) {
         this.serverId = serverId;
     }
 
