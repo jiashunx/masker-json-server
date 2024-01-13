@@ -37,7 +37,7 @@ public class RestContext {
         try {
             new ObjectMapper().readTree(restObj.getRestBody());
         } catch (Throwable throwable) {
-            return RestResult.failWithMessage(String.format("Server[%s]URL[%s]响应报文不是JSON格式，请修改后提交", restObj.getServerId(), restObj.getRestUrl()));
+            return RestResult.failWithMessage(String.format("Server[%s]URL[%s]响应报文不是标准格式JSON，请修改后提交", restObj.getServerId(), restObj.getRestUrl()));
         }
         restObj.setCreateTime(new Date());
         restObj.setLastModifyTime(restObj.getCreateTime());
@@ -53,7 +53,7 @@ public class RestContext {
         try {
             new ObjectMapper().readTree(restObj.getRestBody());
         } catch (Throwable throwable) {
-            return RestResult.failWithMessage(String.format("Server[%s]URL[%s]响应报文不是JSON格式，请修改后提交", restObj.getServerId(), restObj.getRestUrl()));
+            return RestResult.failWithMessage(String.format("Server[%s]URL[%s]响应报文不是标准格式JSON，请修改后提交", restObj.getServerId(), restObj.getRestUrl()));
         }
         restObj.setCreateTime(entity.getCreateTime());
         restObj.setLastModifyTime(new Date());
