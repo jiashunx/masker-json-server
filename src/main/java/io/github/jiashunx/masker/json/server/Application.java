@@ -18,7 +18,7 @@ public class Application {
         // 解析参数
         ArgumentService argumentService = new ArgumentService(args);
         // 初始化SQLite3数据库
-        SQLite3JdbcTemplate jdbcTemplate = new SQLite3JdbcTemplate(System.getProperty("user.dir") + "/json-server.db");
+        SQLite3JdbcTemplate jdbcTemplate = new SQLite3JdbcTemplate(argumentService.getWorkspace() + "/json-server.db");
         // 解析SQLite3数据库表结构
         SQLPackage sqlPackage = SQLite3SQLHelper.loadSQLPackageFromClasspath("ddl-sqlite3.xml");
         // 初始化SQLite3数据库表结构

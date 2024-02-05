@@ -1,5 +1,7 @@
-# masker-json-server
-Web应用：基于masker-rest实现的简易json server（供前端开发使用，用来mock后端接口及报文）
+
+### masker-json-server
+
+Web应用：基于 [masker-rest][1] 实现的简易json server（供前端开发使用，用来mock后端接口及报文）
 
 - 主要功能
 
@@ -17,15 +19,19 @@ Web应用：基于masker-rest实现的简易json server（供前端开发使用�
 
 - 运行配置
 
-   - 运行环境：JDK11
+   - 运行环境：JDK11+
 
    - 启动参数
 
    ```text
    # 指定服务端口（不指定则默认8080）
    -p 18080
+   --port 18080
+   # 指定工作目录（不指定则默认当前程序运行目录）
+   -w /app/json-server
+   --workspace /app/json-server
    # 示例启动命令
-   java -jar masker-json-server.jar -p 18080
+   java -jar masker-json-server.jar -p 18080 -w /app/json-server
    ```
 
    - JVM参数（参考）
