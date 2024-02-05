@@ -43,20 +43,19 @@
     // 组合页面使用父页面layui|独立页面使用当前页面layui
     var rest = new MRest(parent.layui || layui);
     layui.use(function(){
-        var form = layui.form;
-        var layer = layui.layer;
         var $ = layui.$;
+        var form = layui.form;
+        // 若无法获取父页面layui对象则使用当前页面layui对象，以实现iframe在父页面中弹窗
+        var layer = (parent.layui || layui).layer;
 
         // 提交事件
         form.on('submit(serverAction)', function (data) {
-            // 若无法获取父页面layui对象则使用当前页面layui对象，以实现iframe在父页面中弹窗
-            var layer = (parent.layui || layui).layer;
             var field = data.field;
             var serverName = field.serverName;
             var serverPort = field.serverPort;
             var serverContext = field.serverContext;
             // 组合页面修改
-            if (iframeIndex != null) {
+            if (iframeData != null) {
                 rest.axiosRequest({
                     method: 'post',
                     url: '/server/update',
@@ -71,8 +70,8 @@
                             layer.close(index);
                             // 关闭iframe弹窗
                             close();
-                            // 父页面重新加载（按照当前设计，parent获取的是顶层window对象，不一定是实际parent对象）
-                            iframeParent.reload();
+                            // iframe父页面重新加载
+                            reloadParent();
                         });
                     },
                     failFunc: function (data, resp) {
@@ -93,9 +92,10 @@
                 succFunc: function (data, resp) {
                     layer.alert(`新增Server【${serverName}】成功`, {}, function (index) {
                         layer.close(index);
-                        $('input[name="serverName"]').val('');
-                        $('input[name="serverPort"]').val('');
-                        $('input[name="serverContext"]').val('');
+                        // 关闭iframe弹窗
+                        close();
+                        // iframe父页面重新加载
+                        reloadParent();
                     });
                 },
                 failFunc: function (data, resp) {
@@ -117,9 +117,11 @@
         iframeIndex = index;
         iframeParent = parent;
         iframeData = data;
-        layui.$('input[name=serverName]').val(data.serverName);
-        layui.$('input[name=serverPort]').val(data.serverPort);
-        layui.$('input[name=serverContext]').val(data.serverContext);
+        if (iframeData != null) {
+            layui.$('input[name=serverName]').val(data.serverName);
+            layui.$('input[name=serverPort]').val(data.serverPort);
+            layui.$('input[name=serverContext]').val(data.serverContext);
+        }
     }
 
     /**
@@ -130,6 +132,16 @@
             // 若无法获取父页面layui对象则使用当前页面layui对象，以实现iframe在父页面中弹窗
             var layer = (parent.layui || layui).layer;
             layer.close(iframeIndex);
+        }
+    }
+
+    /**
+     * iframe父页面重新加载
+     */
+    function reloadParent() {
+        if (iframeParent != null) {
+            // 父页面重新加载（按照当前设计，parent获取的是顶层window对象，不一定是实际parent对象）
+            iframeParent.reload();
         }
     }
 
