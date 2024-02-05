@@ -44,6 +44,53 @@ Web应用：基于 [masker-rest][1] 实现的简易json server（供前端开发
    -XX:+DisableAttachMechanism
    ```
 
+- Docker部署文档
+
+   - 构建可执行jar包（输出服务包名：json-server.jar）
+
+   - Docker宿主机创建目录
+
+   ```text
+   # 构建&日志&数据存储目录
+   mkdir -p /app/docker/json-server/{build,logs,workspace}
+   ```
+
+   - 拷贝 [Dockerfile](./Dockerfile) 及可执行jar包，上传至安装Docker的主机，存放目录：<b>/app/docker/json-server/build</b>
+
+      - 备注：从容器访问宿主机，使用默认桥接模式访问主机（ip addr show docker0，可查看主机上Docker IP，默认：172.17.0.1）
+
+   - 执行镜像构建命令：<b>docker build -t json-server:${version} ./</b>
+
+      - 镜像名称：json-server
+
+      - 镜像版本：${version}
+
+      - Dockerfile文件名称：参数<b>-f Dockerfile</b>，若不指定"-f"参数默认找"Dockerfile"
+
+      - Dockerfile文件存放目录：<b>./</b>
+
+      - 镜像构建完成后可查看镜像：<b>docker images</b>
+
+   - 至此，Docker镜像已构建完成，以下为部署配置+启动步骤
+
+   - 启动json-server容器命令
+
+   ```text
+   docker run -itd \
+   -v /app/docker/json-server/logs:/app/json-server/logs \
+   -v /app/docker/json-server/workspace:/app/json-server/workspace \
+   --net=host \
+   --restart=always \
+   --name json-server \
+   json-server:${version}
+   
+   # json-server服务运行时涉及http服务的动态启停，在运行时需容器暴露的服务端口会动态变化
+   # 因此不使用"-p "参数来进行端口映射，而是使用"--net=host"来与宿主机共享网络
+   # Dockerfile中启动入口指定了json-server的服务端口18080
+   ```
+
+   - 访问json-server服务：http://宿主机IP:18080
+
 [0]: https://layui.dev
 [1]: https://github.com/jiashunx/masker-rest
 [2]: https://github.com/jiashunx/sdk-sqlite3
