@@ -8,13 +8,18 @@ import io.github.jiashunx.masker.rest.framework.MRestServer;
 import io.github.jiashunx.sdk.sqlite3.mapping.SQLite3JdbcTemplate;
 import io.github.jiashunx.sdk.sqlite3.mapping.util.SQLite3SQLHelper;
 import io.github.jiashunx.sdk.sqlite3.metadata.xml.SQLPackage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jiashunx
  */
 public class Application {
 
+    private static final Logger logger = LoggerFactory.getLogger(Application.class);
+
     public static void main(String[] args) {
+        long startTimeMillis = System.currentTimeMillis();
         // 解析参数
         ArgumentService argumentService = new ArgumentService(args);
         // 初始化SQLite3数据库
@@ -39,6 +44,9 @@ public class Application {
                 .servlet(servlet)
                 .getRestServer()
                 .start();
+        long endTimeMillis = System.currentTimeMillis();
+        logger.info("Server started on port(s) {} (http)", restServer.getListenPort());
+        logger.info("Started Application in {} seconds", (endTimeMillis - startTimeMillis) / 1000D);
     }
 
 }
