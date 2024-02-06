@@ -15,6 +15,8 @@ public class ArgumentService {
 
     private static final int DEFAULT_LISTEN_PORT = 8080;
 
+    private static final String DEFAULT_WORKSPACE = System.getProperty("user.dir").replace("\\", "/");
+
     private final CommandLine commandLine;
 
     public ArgumentService(String[] args) {
@@ -22,6 +24,8 @@ public class ArgumentService {
         Options options = new Options();
         // -p 8080 | --port 8080
         options.addOption("p", "port", true, "server port, defualt: " + DEFAULT_LISTEN_PORT);
+        // -w /app/json-server | --workspace /app/json-server
+        options.addOption("w", "workspace", true, "workspace, default: " + DEFAULT_WORKSPACE);
         try {
             this.commandLine = commandLineParser.parse(options, args);
         } catch (ParseException e) {
@@ -37,6 +41,16 @@ public class ArgumentService {
             return Integer.parseInt(commandLine.getOptionValue("port"));
         }
         return DEFAULT_LISTEN_PORT;
+    }
+
+    public String getWorkspace() {
+        if (commandLine.hasOption('w')) {
+            return commandLine.getOptionValue('w');
+        }
+        if (commandLine.hasOption("workspace")) {
+            return commandLine.getOptionValue("workspace");
+        }
+        return DEFAULT_WORKSPACE;
     }
 
 }

@@ -32,8 +32,8 @@ public class Servlet extends AbstractRestServlet {
     private final ServerEngine serverEngine;
 
     public Servlet(ArgumentService argumentService, TbServerService tbServerService, TbRestService tbRestService) {
-        this.serverContext = new ServerContext(argumentService, tbServerService);
-        this.restContext = new RestContext(tbRestService);
+        this.serverContext = new ServerContext(argumentService, tbServerService, tbRestService);
+        this.restContext = new RestContext(tbServerService, tbRestService);
         this.serverEngine = new ServerEngine(this.serverContext, this.restContext);
         this.serverContext.setServerEngine(this.serverEngine);
     }

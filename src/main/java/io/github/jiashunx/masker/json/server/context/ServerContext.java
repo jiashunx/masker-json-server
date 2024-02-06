@@ -6,6 +6,7 @@ import io.github.jiashunx.masker.json.server.model.TbServer;
 import io.github.jiashunx.masker.json.server.model.invo.PageQueryVo;
 import io.github.jiashunx.masker.json.server.model.outvo.PageQueryOutVo;
 import io.github.jiashunx.masker.json.server.service.ArgumentService;
+import io.github.jiashunx.masker.json.server.service.TbRestService;
 import io.github.jiashunx.masker.json.server.service.TbServerService;
 import io.github.jiashunx.masker.json.server.type.ServerStatus;
 import io.github.jiashunx.masker.rest.framework.util.MRestUtils;
@@ -22,11 +23,13 @@ public class ServerContext {
 
     private final ArgumentService argumentService;
     private final TbServerService tbServerService;
+    private final TbRestService tbRestService;
     private ServerEngine serverEngine;
 
-    public ServerContext(ArgumentService argumentService, TbServerService tbServerService) {
+    public ServerContext(ArgumentService argumentService, TbServerService tbServerService, TbRestService tbRestService) {
         this.argumentService = Objects.requireNonNull(argumentService);
         this.tbServerService = Objects.requireNonNull(tbServerService);
+        this.tbRestService = Objects.requireNonNull(tbRestService);
     }
 
     public RestResult create(TbServer serverObj) {
@@ -84,6 +87,12 @@ public class ServerContext {
         if (entity == null) {
             return RestResult.failWithMessage(String.format("根据Server实例ID[%s]找不到对应记录", serverObj.getServerId()));
         }
+        int restRecordsCount = tbRestService.getJdbcTemplate().queryForInt("select count(1) from tb_rest where server_id=?", statement -> {
+            statement.setString(1, serverObj.getServerId());
+        });
+        if (restRecordsCount > 0) {
+            return RestResult.failWithMessage(String.format("当前Server实例ID[%s]已配置Rest接口，数量：%d，无法删除Server实例", serverObj.getServerId(), restRecordsCount));
+        }
         tbServerService.deleteById(serverObj.getServerId());
         // 停止Server
         serverEngine.stopServer(serverObj.getServerId());
@@ -103,6 +112,10 @@ public class ServerContext {
 
     public TbServerService getTbServerService() {
         return tbServerService;
+    }
+
+    public TbRestService getTbRestService() {
+        return tbRestService;
     }
 
     public ServerEngine getServerEngine() {

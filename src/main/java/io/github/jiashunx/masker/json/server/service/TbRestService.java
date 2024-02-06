@@ -29,8 +29,8 @@ public class TbRestService extends SQLite3Service<TbRest, String> {
         });
     }
 
-    public TbRest queryByServerIdAndRestUrl(String serverId, String restUrl) {
-        return getJdbcTemplate().queryForObj("select * from tb_rest where server_id=? and rest_url=?", statement -> {
+    public List<TbRest> queryByServerIdAndRestUrl(String serverId, String restUrl) {
+        return getJdbcTemplate().queryForList("select * from tb_rest where server_id=? and rest_url=?", statement -> {
             statement.setString(1, serverId);
             statement.setString(2, restUrl);
         }, TbRest.class);

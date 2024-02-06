@@ -27,6 +27,12 @@
         </div>
     </div>
     <div class="layui-form-item">
+        <label class="layui-form-label">路由表达式</label>
+        <div class="layui-input-block">
+            <input type="text" name="expression" lay-verify="" placeholder='请输入路由表达式（aviator表达式，路由变量：headers,params,body，例如：headers.h="hv" && params.p="pv" && body.b="bv"）' autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
         <label class="layui-form-label">Rest接口响应JSON</label>
         <div class="layui-input-block">
             <textarea name="restBody" lay-verify="required" placeholder="请输入Rest接口响应JSON" autocomplete="off" class="layui-textarea"></textarea>
@@ -49,9 +55,10 @@
     // 组合页面使用父页面layui|独立页面使用当前页面layui
     var rest = new MRest(parent.layui || layui);
     layui.use(function(){
-        var form = layui.form;
-        var layer = layui.layer;
         var $ = layui.$;
+        var form = layui.form;
+        // 若无法获取父页面layui对象则使用当前页面layui对象，以实现iframe在父页面中弹窗
+        var layer = (parent.layui || layui).layer;
 
         // 查询归属Server数据
         rest.axiosRequest({
@@ -67,7 +74,7 @@
                 }
                 // 默认清空分类下拉框
                 var defaultServerVal = '';
-                if (iframeIndex != null) {
+                if (iframeData != null) {
                     // 默认选择第一个选项
                     // $(`#serverId option:eq(0)`).attr("selected", 'selected');
                     // 修改界面回显分类下拉框
@@ -85,15 +92,14 @@
 
         // 提交事件
         form.on('submit(restAction)', function (data) {
-            // 若无法获取父页面layui对象则使用当前页面layui对象，以实现iframe在父页面中弹窗
-            var layer = (parent.layui || layui).layer;
             var field = data.field;
             var serverId = field.serverId;
             var restName = field.restName;
             var restUrl = field.restUrl;
+            var expression = field.expression;
             var restBody = field.restBody;
             // 组合页面修改
-            if (iframeIndex != null) {
+            if (iframeData != null) {
                 rest.axiosRequest({
                     method: 'post',
                     url: '/rest/update',
@@ -102,6 +108,7 @@
                         serverId: serverId,
                         restName: restName,
                         restUrl: restUrl,
+                        expression: expression,
                         restBody: restBody,
                     },
                     succFunc: function (data, resp) {
@@ -109,8 +116,8 @@
                             layer.close(index);
                             // 关闭iframe弹窗
                             close();
-                            // 父页面重新加载（按照当前设计，parent获取的是顶层window对象，不一定是实际parent对象）
-                            iframeParent.reload();
+                            // iframe父页面重新加载
+                            reloadParent();
                         });
                     },
                     failFunc: function (data, resp) {
@@ -127,11 +134,16 @@
                     serverId: serverId,
                     restName: restName,
                     restUrl: restUrl,
+                    expression: expression,
                     restBody: restBody,
                 },
                 succFunc: function (data, resp) {
                     layer.alert(`新增Rest接口【${restName}】成功`, {}, function (index) {
                         layer.close(index);
+                        // 关闭iframe弹窗
+                        close();
+                        // iframe父页面重新加载
+                        reloadParent();
                     });
                 },
                 failFunc: function (data, resp) {
@@ -153,9 +165,12 @@
         iframeIndex = index;
         iframeParent = parent;
         iframeData = data;
-        layui.$('input[name=restName]').val(data.restName);
-        layui.$('input[name=restUrl]').val(data.restUrl);
-        layui.$('textarea[name=restBody]').val(data.restBody);
+        if (iframeData != null) {
+            layui.$('input[name=restName]').val(data.restName);
+            layui.$('input[name=restUrl]').val(data.restUrl);
+            layui.$('input[name=expression]').val(data.expression);
+            layui.$('textarea[name=restBody]').val(data.restBody);
+        }
     }
 
     /**
@@ -166,6 +181,16 @@
             // 若无法获取父页面layui对象则使用当前页面layui对象，以实现iframe在父页面中弹窗
             var layer = (parent.layui || layui).layer;
             layer.close(iframeIndex);
+        }
+    }
+
+    /**
+     * iframe父页面重新加载
+     */
+    function reloadParent() {
+        if (iframeParent != null) {
+            // 父页面重新加载（按照当前设计，parent获取的是顶层window对象，不一定是实际parent对象）
+            iframeParent.reload();
         }
     }
 

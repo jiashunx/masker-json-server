@@ -45,6 +45,12 @@ public class TbRest {
     private String restBody;
 
     /**
+     * aviator表达式
+     */
+    @SQLite3Column(columnName = "expression")
+    private String expression;
+
+    /**
      * 创建时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -96,6 +102,14 @@ public class TbRest {
 
     public void setRestBody(String restBody) {
         this.restBody = restBody;
+    }
+
+    public String getExpression() {
+        return expression;
+    }
+
+    public void setExpression(String expression) {
+        this.expression = expression;
     }
 
     public Date getCreateTime() {
