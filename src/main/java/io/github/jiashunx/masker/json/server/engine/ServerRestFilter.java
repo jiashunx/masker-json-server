@@ -1,5 +1,6 @@
 package io.github.jiashunx.masker.json.server.engine;
 
+import com.googlecode.aviator.AviatorEvaluator;
 import io.github.jiashunx.masker.json.server.context.RestContext;
 import io.github.jiashunx.masker.json.server.model.RestResult;
 import io.github.jiashunx.masker.json.server.model.TbRest;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -44,14 +46,23 @@ public class ServerRestFilter implements MRestFilter {
             if (restUrlList.contains(requestUrl)) {
                 List<TbRest> restList = tbRestService.queryByServerIdAndRestUrl(serverId, requestUrl);
                 if (restList != null && !restList.isEmpty()) {
-                    Map<String, String> cookies = request.getParameters();
                     TbRest defaultRest = null;
                     for (TbRest rest: restList) {
                         if (StringUtils.isBlank(rest.getExpression())) {
                             defaultRest = rest;
                             continue;
                         }
-                        // TODO 获取headers,params,body等数据，利用aviator表达式匹配处理
+                        Map<String, Object> env = null;
+                        try {
+                            env = buildAviatorEnv(request, rest.getExpression());
+                            Boolean result = (Boolean) AviatorEvaluator.compile(rest.getExpression()).execute(env);
+                            if (result) {
+                                content = rest.getRestBody();
+                                break;
+                            }
+                        } catch (Throwable throwable) {
+                            logger.error("路由表达式处理异常，Rest接口实例ID：{}，Rest接口URL：{}，aviator表达式：{}，aviator表达式传递env参数：{}", rest.getRestId(), rest.getRestUrl(), rest.getExpression(), env, throwable);
+                        }
                     }
                     if (defaultRest != null) {
                         content = defaultRest.getRestBody();
@@ -69,6 +80,43 @@ public class ServerRestFilter implements MRestFilter {
             return;
         }
         filterChain.doFilter(request, response);
+    }
+
+    private Map<String, Object> buildAviatorEnv(MRestRequest request, String expression) {
+        Map<String, Object> env = new HashMap<>();
+        if (expression.contains("headers.")) {
+            env.put("headers", getRequestHeaders(request));
+        }
+        if (expression.contains("params.")) {
+            env.put("params", getRequestParams(request));
+        }
+        if (expression.contains("body.")) {
+            env.put("body", getRequestBody(request));
+        }
+        return env;
+    }
+
+    private Map<String, Object> getRequestHeaders(MRestRequest request) {
+        Map<String, Object> headers = new HashMap<>();
+        for (String k: request.getHeaderKeys()) {
+            headers.put(k, request.getHeader(k));
+        }
+        return headers;
+    }
+
+    private Map<String, Object> getRequestParams(MRestRequest request) {
+        Map<String, Object> params = new HashMap<>();
+        request.getParameters().forEach(params::put);
+        return params;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getRequestBody(MRestRequest request) {
+        Map<String, Object> body = new HashMap<>();
+        if (request.getBodyBytes() != null && request.getBodyBytes().length > 0) {
+            body = MRestSerializer.jsonToObj(request.getBodyBytes(), Map.class);
+        }
+        return body;
     }
 
 }
