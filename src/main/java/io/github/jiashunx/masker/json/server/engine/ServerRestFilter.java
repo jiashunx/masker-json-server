@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -41,9 +42,20 @@ public class ServerRestFilter implements MRestFilter {
             TbRestService tbRestService = restContext.getTbRestService();
             List<String> restUrlList = tbRestService.queryByServerId(serverId).stream().map(TbRest::getRestUrl).collect(Collectors.toList());
             if (restUrlList.contains(requestUrl)) {
-                TbRest rest = tbRestService.queryByServerIdAndRestUrl(serverId, requestUrl);
-                if (rest != null) {
-                    content = rest.getRestBody();
+                List<TbRest> restList = tbRestService.queryByServerIdAndRestUrl(serverId, requestUrl);
+                if (restList != null && !restList.isEmpty()) {
+                    Map<String, String> cookies = request.getParameters();
+                    TbRest defaultRest = null;
+                    for (TbRest rest: restList) {
+                        if (StringUtils.isBlank(rest.getExpression())) {
+                            defaultRest = rest;
+                            continue;
+                        }
+                        // TODO 获取headers,params,body等数据，利用aviator表达式匹配处理
+                    }
+                    if (defaultRest != null) {
+                        content = defaultRest.getRestBody();
+                    }
                 }
             }
             if (StringUtils.isEmpty(content)) {
