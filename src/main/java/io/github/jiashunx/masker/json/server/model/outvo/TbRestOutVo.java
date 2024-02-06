@@ -44,6 +44,12 @@ public class TbRestOutVo extends TbRest {
     private String restBody;
 
     /**
+     * aviator表达式
+     */
+    @SQLite3Column(columnName = "expression")
+    private String expression;
+
+    /**
      * 创建时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -99,6 +105,16 @@ public class TbRestOutVo extends TbRest {
 
     public void setRestUrl(String restUrl) {
         this.restUrl = restUrl;
+    }
+
+    @Override
+    public String getExpression() {
+        return expression;
+    }
+
+    @Override
+    public void setExpression(String expression) {
+        this.expression = expression;
     }
 
     public String getRestBody() {

@@ -27,6 +27,12 @@
         </div>
     </div>
     <div class="layui-form-item">
+        <label class="layui-form-label">路由表达式</label>
+        <div class="layui-input-block">
+            <input type="text" name="expression" lay-verify="" placeholder="请输入路由表达式（aviator表达式，路由变量：cookies,headers,params,body）" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
         <label class="layui-form-label">Rest接口响应JSON</label>
         <div class="layui-input-block">
             <textarea name="restBody" lay-verify="required" placeholder="请输入Rest接口响应JSON" autocomplete="off" class="layui-textarea"></textarea>
@@ -90,6 +96,7 @@
             var serverId = field.serverId;
             var restName = field.restName;
             var restUrl = field.restUrl;
+            var expression = field.expression;
             var restBody = field.restBody;
             // 组合页面修改
             if (iframeData != null) {
@@ -101,6 +108,7 @@
                         serverId: serverId,
                         restName: restName,
                         restUrl: restUrl,
+                        expression: expression,
                         restBody: restBody,
                     },
                     succFunc: function (data, resp) {
@@ -126,6 +134,7 @@
                     serverId: serverId,
                     restName: restName,
                     restUrl: restUrl,
+                    expression: expression,
                     restBody: restBody,
                 },
                 succFunc: function (data, resp) {
@@ -159,6 +168,7 @@
         if (iframeData != null) {
             layui.$('input[name=restName]').val(data.restName);
             layui.$('input[name=restUrl]').val(data.restUrl);
+            layui.$('input[name=expression]').val(data.expression);
             layui.$('textarea[name=restBody]').val(data.restBody);
         }
     }
