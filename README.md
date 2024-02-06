@@ -9,6 +9,24 @@ Web应用：基于 [masker-rest][1] 实现的简易json server（供前端开发
 
    - 为http server动态配置响应json格式数据的接口
 
+   - 支持根据接口参数（headers、params、body）来通过aviator表达式匹配返回不同json格式数据（例如：分页查询接口，根据页码返回不同页数据）
+
+      - headers：请求头（从http请求头获取请求header）
+
+         - 注意：headers参数对象下的元素为key-value键值对，value值类型为字符串
+
+      - params：请求接口URL参数
+
+         - 注意：params参数对象下的元素为key-value键值对，value值类型为字符串
+
+      - body：请求body对象（http请求body，格式：json）
+
+         - 注意：body对象下的元素为key-value键值对，value值类型为json数据的各类值类型
+
+      - 路由表达式的结果应为布尔值，含义为路由表达式通过则匹配返回相应接口报文
+
+      - 路由表达式样例：headers.key1 == "value1" && params.key2 == "value2" && body.key3 == "value3" && body.key5 == 5
+
 - 技术组件
 
    - 使用 [layui][0] 实现前端控制台
