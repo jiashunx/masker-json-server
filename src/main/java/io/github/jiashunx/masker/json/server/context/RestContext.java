@@ -78,7 +78,7 @@ public class RestContext {
     public RestResult queryList(PageQueryVo pageQueryVo) {
         int total = tbRestService.getJdbcTemplate().queryForInt("select count(1) from tb_rest");
         return RestResult.ok(new PageQueryOutVo<>().setTotal(total).setRecords(tbRestService.getJdbcTemplate().queryForList(
-               "select a.rest_id,a.rest_name,a.server_id,a.rest_url,a.rest_body,a.expression,a.create_time,a.last_modify_time,b.server_port,b.server_context " +
+               "select a.rest_id,a.rest_name,a.server_id,a.rest_url,a.rest_body,a.expression,a.proxy_enabled,a.proxy_url,a.create_time,a.last_modify_time,b.server_port,b.server_context " +
                     "from tb_rest a " +
                     "left join tb_server b on a.server_id = b.server_id " +
                     "order by a.last_modify_time desc " +

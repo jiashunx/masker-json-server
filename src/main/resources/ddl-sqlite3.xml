@@ -22,6 +22,8 @@
             <column name="rest_url" type="nvarchar(512)" not-null="true" />
             <column name="rest_body" type="clob" not-null="true" />
             <column name="expression" type="clob" not-null="false" />
+            <column name="proxy_enabled" type="varchar(1)" />
+            <column name="proxy_url" type="clob" />
             <column name="create_time" type="timestamp" not-null="true" />
             <column name="last_modify_time" type="timestamp" not-null="true" />
         </table>

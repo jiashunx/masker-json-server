@@ -51,6 +51,18 @@ public class TbRest {
     private String expression;
 
     /**
+     * Rest接口代理是否开启（0-否，1-是），默认0-否
+     */
+    @SQLite3Column(columnName = "proxy_enabled")
+    private String proxyEnabled = "0";
+
+    /**
+     * Rest接口代理目标url
+     */
+    @SQLite3Column(columnName = "proxy_url")
+    private String proxyUrl;
+
+    /**
      * 创建时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -110,6 +122,31 @@ public class TbRest {
 
     public void setExpression(String expression) {
         this.expression = expression;
+    }
+
+    @Deprecated
+    public String getProxyEnabled() {
+        return proxyEnabled;
+    }
+
+    public void setProxyEnabled(String proxyEnabled) {
+        this.proxyEnabled = proxyEnabled;
+    }
+
+    public boolean isProxyEnabled() {
+        return "1".equals(this.proxyEnabled);
+    }
+
+    public void setProxyEnabled(boolean proxyEnabled) {
+        this.proxyEnabled = proxyEnabled ? "1" : "0";
+    }
+
+    public String getProxyUrl() {
+        return proxyUrl;
+    }
+
+    public void setProxyUrl(String proxyUrl) {
+        this.proxyUrl = proxyUrl;
     }
 
     public Date getCreateTime() {
