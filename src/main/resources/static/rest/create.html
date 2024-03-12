@@ -39,9 +39,9 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">代理目标地址</label>
+        <label class="layui-form-label">代理Server</label>
         <div class="layui-input-block">
-            <input type="text" name="proxyUrl" lay-verify="" placeholder="请输入代理目标地址URL" autocomplete="off" class="layui-input">
+            <input type="text" name="proxyServer" lay-verify="" placeholder="请输入代理Server（例如：http://127.0.0.1:18080）" autocomplete="off" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
@@ -120,7 +120,7 @@
             var expression = field.expression;
             var restBody = field.restBody;
             var proxyEnabled = field.proxyEnabled;
-            var proxyUrl = field.proxyUrl;
+            var proxyServer = field.proxyServer;
             // 组合页面修改
             if (iframeData != null) {
                 rest.axiosRequest({
@@ -134,7 +134,7 @@
                         expression: expression,
                         restBody: restBody,
                         proxyEnabled: proxyEnabled,
-                        proxyUrl: proxyUrl,
+                        proxyServer: proxyServer,
                     },
                     succFunc: function (data, resp) {
                         layer.alert(`修改Rest接口【${restName}】成功`, {}, function (index) {
@@ -162,7 +162,7 @@
                     expression: expression,
                     restBody: restBody,
                     proxyEnabled: proxyEnabled,
-                    proxyUrl: proxyUrl,
+                    proxyServer: proxyServer,
                 },
                 succFunc: function (data, resp) {
                     layer.alert(`新增Rest接口【${restName}】成功`, {}, function (index) {
@@ -196,7 +196,7 @@
             layui.$('input[name=restName]').val(data.restName);
             layui.$('input[name=restUrl]').val(data.restUrl);
             layui.$('input[name=expression]').val(data.expression);
-            layui.$('input[name=proxyUrl]').val(data.proxyUrl);
+            layui.$('input[name=proxyServer]').val(data.proxyServer);
             layui.$('textarea[name=restBody]').val(data.restBody);
         }
     }

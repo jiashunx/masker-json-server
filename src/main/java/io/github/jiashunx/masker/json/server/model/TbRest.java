@@ -57,10 +57,10 @@ public class TbRest {
     private String proxyEnabled = "0";
 
     /**
-     * Rest接口代理目标url
+     * Rest接口代理Server
      */
-    @SQLite3Column(columnName = "proxy_url")
-    private String proxyUrl;
+    @SQLite3Column(columnName = "proxy_server")
+    private String proxyServer;
 
     /**
      * 创建时间
@@ -141,12 +141,12 @@ public class TbRest {
         this.proxyEnabled = proxyEnabled ? "1" : "0";
     }*/
 
-    public String getProxyUrl() {
-        return proxyUrl;
+    public String getProxyServer() {
+        return proxyServer;
     }
 
-    public void setProxyUrl(String proxyUrl) {
-        this.proxyUrl = proxyUrl;
+    public void setProxyServer(String proxyServer) {
+        this.proxyServer = proxyServer;
     }
 
     public Date getCreateTime() {
