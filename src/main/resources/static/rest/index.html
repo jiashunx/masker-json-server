@@ -59,10 +59,13 @@
                 };
                 for (var i = 0; i < arr.data.length; i++) {
                     var data = arr.data[i];
-                    if (data['serverContext'] === '/') {
-                        data['serverContext'] = '';
+                    var serverContext = data['serverContext'];
+                    if (serverContext === '/') {
+                        serverContext = '';
                     }
-                    data['httpUrl'] = window.location.protocol + window.location.hostname + ':' + data['serverPort'] + data['serverContext'] + data['restUrl'];
+                    data['httpUrl'] = window.location.protocol + window.location.hostname + ':' + data['serverPort'] + serverContext + data['restUrl'];
+                    data['isProxyEnabled'] = data['proxyEnabled'] === '1' ? '是' : '否';
+                    data['proxyServer'] = data['proxyServer'] || '';
                 }
                 return arr;
             },
@@ -84,6 +87,8 @@
                 {field:'restName', title: 'Rest接口名称', minWidth: 200, align: 'center'},
                 {field:'httpUrl', title: 'Rest接口URL', minWidth: 300, align: 'center'},
                 {field:'expression', title: '路由表达式', minWidth: 300, align: 'center'},
+                {field:'isProxyEnabled', title: '是否开启代理', minWidth: 150, align: 'center'},
+                {field:'proxyServer', title: '代理Server', minWidth: 300, align: 'center'},
                 {field:'createTime', title: '创建时间', width: 166, align: 'center'},
                 {field:'lastModifyTime', title: '最后更新时间', width: 166, align: 'center'},
                 {width:160, title: '操作', toolbar: '#table-rests-action', align: 'center'}

@@ -19,6 +19,8 @@ public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) {
+        // fix: JDK11 HttpClient restricted header name: “xxx“ 异常，JDK11无法绕过，JDK17,JDK21可绕过
+        System.setProperty("jdk.httpclient.allowRestrictedHeaders", "connection,content-length,expect,host,upgrade");
         long startTimeMillis = System.currentTimeMillis();
         // 解析参数
         ArgumentService argumentService = new ArgumentService(args);

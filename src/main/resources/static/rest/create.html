@@ -29,7 +29,19 @@
     <div class="layui-form-item">
         <label class="layui-form-label">路由表达式</label>
         <div class="layui-input-block">
-            <input type="text" name="expression" lay-verify="" placeholder='请输入路由表达式（aviator表达式，路由变量：headers,params,body，例如：headers.h="hv" && params.p="pv" && body.b="bv"）' autocomplete="off" class="layui-input">
+            <input type="text" name="expression" lay-verify="" placeholder='请输入路由表达式（aviator表达式，路由变量：method,headers,params,body，例如：method="post" && headers.h="hv" && params.p="pv" && body.b="bv"）' autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否开启代理</label>
+        <div class="layui-input-block">
+            <select id="proxyEnabled" name="proxyEnabled" lay-verify="required" placeholder="选择是否开启代理" autocomplete="off" class="layui-select layui-select-group" ></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">代理Server</label>
+        <div class="layui-input-block">
+            <input type="text" name="proxyServer" lay-verify="" placeholder="请输入代理Server（例如：http://127.0.0.1:18080）" autocomplete="off" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
@@ -72,17 +84,26 @@
                         `serverPort=${data[i]['serverPort']},serverContext=${data[i]['serverContext']},serverName=${data[i]['serverName']}`
                         , data[i]['serverId']));
                 }
-                // 默认清空分类下拉框
+                var proxyEnabledSelect = document.getElementById('proxyEnabled');
+                proxyEnabledSelect.appendChild(new Option('是', '1'));
+                proxyEnabledSelect.appendChild(new Option('否', '0'));
+                // 默认清空归属Server下拉框
                 var defaultServerVal = '';
+                // 默认清空是否开启代理下拉框
+                var defaultProxyEnabled = '';
                 if (iframeData != null) {
                     // 默认选择第一个选项
                     // $(`#serverId option:eq(0)`).attr("selected", 'selected');
-                    // 修改界面回显分类下拉框
+                    // 修改界面回显归属Server下拉框
                     defaultServerVal = iframeData.serverId;
+                    // 修改界面回显是否开启代理下拉框
+                    defaultProxyEnabled = iframeData.proxyEnabled === '1' ? '1' : '0';
                 }
                 // 回显归属Server下拉框
                 $(`#serverId`).val(defaultServerVal);
-                // 渲染分类下拉框
+                // 回显是否开启代理下拉框
+                $(`#proxyEnabled`).val(defaultProxyEnabled);
+                // 渲染下拉框
                 form.render('select');
             },
             failFunc: function (data, resp) {
@@ -98,6 +119,8 @@
             var restUrl = field.restUrl;
             var expression = field.expression;
             var restBody = field.restBody;
+            var proxyEnabled = field.proxyEnabled;
+            var proxyServer = field.proxyServer;
             // 组合页面修改
             if (iframeData != null) {
                 rest.axiosRequest({
@@ -110,6 +133,8 @@
                         restUrl: restUrl,
                         expression: expression,
                         restBody: restBody,
+                        proxyEnabled: proxyEnabled,
+                        proxyServer: proxyServer,
                     },
                     succFunc: function (data, resp) {
                         layer.alert(`修改Rest接口【${restName}】成功`, {}, function (index) {
@@ -136,6 +161,8 @@
                     restUrl: restUrl,
                     expression: expression,
                     restBody: restBody,
+                    proxyEnabled: proxyEnabled,
+                    proxyServer: proxyServer,
                 },
                 succFunc: function (data, resp) {
                     layer.alert(`新增Rest接口【${restName}】成功`, {}, function (index) {
@@ -169,6 +196,7 @@
             layui.$('input[name=restName]').val(data.restName);
             layui.$('input[name=restUrl]').val(data.restUrl);
             layui.$('input[name=expression]').val(data.expression);
+            layui.$('input[name=proxyServer]').val(data.proxyServer);
             layui.$('textarea[name=restBody]').val(data.restBody);
         }
     }
