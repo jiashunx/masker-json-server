@@ -9,7 +9,9 @@ Web应用：基于 [masker-rest][1] 实现的简易json server（供前端开发
 
    - 为http server动态配置响应json格式数据的接口
 
-   - 支持根据接口参数（headers、params、body）来通过aviator表达式匹配返回不同json格式数据（例如：分页查询接口，根据页码返回不同页数据）
+   - 支持根据接口参数（method、headers、params、body）来通过aviator表达式匹配返回不同json格式数据（例如：分页查询接口，根据页码返回不同页数据）
+
+      - method：http method（例如：get、post、put、delete等）
 
       - headers：请求头（从http请求头获取请求header）
 
@@ -25,7 +27,7 @@ Web应用：基于 [masker-rest][1] 实现的简易json server（供前端开发
 
       - 路由表达式的结果应为布尔值，含义为路由表达式通过则匹配返回相应接口报文
 
-      - 路由表达式样例：headers.key1 == "value1" && params.key2 == "value2" && body.key3 == "value3" && body.key5 == 5
+      - 路由表达式样例：method == "post" && headers.key1 == "value1" && params.key2 == "value2" && body.key3 == "value3" && body.key5 == 5
 
 - 技术组件
 

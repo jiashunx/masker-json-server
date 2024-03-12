@@ -42,31 +42,29 @@ public class ServerRestFilter implements MRestFilter {
         String content = "";
         try {
             TbRestService tbRestService = restContext.getTbRestService();
-            List<String> restUrlList = tbRestService.queryByServerId(serverId).stream().map(TbRest::getRestUrl).collect(Collectors.toList());
-            if (restUrlList.contains(requestUrl)) {
-                List<TbRest> restList = tbRestService.queryByServerIdAndRestUrl(serverId, requestUrl);
-                if (restList != null && !restList.isEmpty()) {
-                    TbRest defaultRest = null;
-                    for (TbRest rest: restList) {
-                        if (StringUtils.isBlank(rest.getExpression())) {
-                            defaultRest = rest;
-                            continue;
-                        }
-                        Map<String, Object> env = null;
-                        try {
-                            env = buildAviatorEnv(request, rest.getExpression());
-                            Boolean result = (Boolean) AviatorEvaluator.compile(rest.getExpression()).execute(env);
-                            if (result) {
-                                content = rest.getRestBody();
-                                break;
-                            }
-                        } catch (Throwable throwable) {
-                            logger.error("路由表达式处理异常，Rest接口实例ID：{}，Rest接口URL：{}，aviator表达式：{}，aviator表达式传递env参数：{}", rest.getRestId(), rest.getRestUrl(), rest.getExpression(), env, throwable);
-                        }
+            List<TbRest> restList = tbRestService.queryByServerIdAndRestUrl(serverId, requestUrl);
+            if (restList != null && !restList.isEmpty()) {
+                TbRest defaultRest = null;
+                for (TbRest rest: restList) {
+                    if (StringUtils.isBlank(rest.getExpression())) {
+                        defaultRest = rest;
+                        continue;
                     }
-                    if (defaultRest != null) {
-                        content = defaultRest.getRestBody();
+                    Map<String, Object> env = null;
+                    try {
+                        env = buildAviatorEnv(request, rest.getExpression());
+                        Boolean result = (Boolean) AviatorEvaluator.compile(rest.getExpression()).execute(env);
+                        if (result) {
+                            content = rest.getRestBody();
+                            break;
+                        }
+                    } catch (Throwable throwable) {
+                        logger.error("路由表达式处理异常，Rest接口实例ID：{}，Rest接口URL：{}，aviator表达式：{}，aviator表达式传递env参数：{}", rest.getRestId(), rest.getRestUrl(), rest.getExpression(), env, throwable);
                     }
+                }
+                // 若存在默认接口配置则返回相应响应内容
+                if (StringUtils.isEmpty(content) && defaultRest != null) {
+                    content = defaultRest.getRestBody();
                 }
             }
             if (StringUtils.isEmpty(content)) {
@@ -84,6 +82,7 @@ public class ServerRestFilter implements MRestFilter {
 
     private Map<String, Object> buildAviatorEnv(MRestRequest request, String expression) {
         Map<String, Object> env = new HashMap<>();
+        env.put("method", request.getMethod().name().toLowerCase());
         if (expression.contains("headers.")) {
             env.put("headers", getRequestHeaders(request));
         }
