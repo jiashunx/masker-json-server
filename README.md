@@ -29,6 +29,8 @@ Web应用：基于 [masker-rest][1] 实现的简易json server（供前端开发
 
       - 路由表达式样例：method == "post" && headers.key1 == "value1" && params.key2 == "value2" && body.key3 == "value3" && body.key5 == 5
 
+   - 支持配置接口的代理Server（保证接口服务地址不变的情况下可一键切换mock报文或真实服务地址）
+
 - 技术组件
 
    - 使用 [layui][0] 实现前端控制台
