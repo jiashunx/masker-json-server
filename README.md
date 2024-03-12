@@ -39,7 +39,7 @@ Web应用：基于 [masker-rest][1] 实现的简易json server（供前端开发
 
 - 运行配置
 
-   - 运行环境：JDK11+
+   - 运行环境：JDK17+
 
    - 启动参数
 
