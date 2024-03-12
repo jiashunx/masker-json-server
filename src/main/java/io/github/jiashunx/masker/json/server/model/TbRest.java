@@ -137,9 +137,9 @@ public class TbRest {
         return "1".equals(this.proxyEnabled);
     }
 
-    public void setProxyEnabled(boolean proxyEnabled) {
+    /*public void setProxyEnabled(boolean proxyEnabled) {
         this.proxyEnabled = proxyEnabled ? "1" : "0";
-    }
+    }*/
 
     public String getProxyUrl() {
         return proxyUrl;
